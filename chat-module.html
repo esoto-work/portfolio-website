@@ -1,0 +1,436 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Profile and Sound Wave</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+  <!-- Orbitron font for futuristic look -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+   body {
+  background-color: #000;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+   backdrop-filter: blur(8px); /* optional: glass effect */
+}
+
+#chat {
+  background-color: rgba(0, 0, 0, 0.6); /* semi-transparent black */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px); /* optional: glass effect */
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+#chat-messages {
+  background-color: #000;
+  border: 1px solid #fff;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  height: 200px;
+  overflow-y: auto;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.message {
+  margin-bottom: 0.5rem;
+  word-wrap: break-word;
+}
+
+.user-message,
+.bot-message {
+  color: #fff;
+}
+
+input#chat-input {
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 0.5rem 0 0 0.5rem;
+  padding: 0.5rem;
+  flex: 1;
+}
+
+input#chat-input:focus {
+  outline: none;
+  border-color: #fff;
+}
+
+button {
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+.reactive-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, white, transparent);
+  animation: react 1s infinite;
+}
+
+@keyframes react {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+  </style>
+</head>
+<body class="bg-black flex flex-col items-center justify-between min-h-screen relative ">
+   <!--  <div class="absolute top-4 right-4 flex space-x-2">
+    <button id="more-options" class="bg-black text-white p-2 rounded-full flex items-center justify-center">
+      <i class="fas fa-ellipsis-h"></i>
+     </button>
+    <button id="analyze-document" class="bg-black text-white p-2 rounded-full flex items-center justify-center">
+      <i class="fas fa-file-medical-alt"></i>
+    </button>
+    <button id="home-button" class="bg-black text-white p-2 rounded-full flex items-center justify-center">
+      <i class="fas fa-home"></i>
+    </button>
+    <button id="clear-chat" class="bg-black text-white p-2 rounded-full flex items-center justify-center">
+      <i class="fas fa-trash"></i>
+    </button> -->
+  </div>
+
+  <div class="flex flex-col items-center space-y-4 mt-20 mb-4 relative">
+    <div id="reactive-circle" class="reactive-circle w-48 h-48 hidden"></div>
+    <div class="flex space-x-4">
+    <!--  <img alt="Profile picture of two people smiling" class="w-32 h-32 rounded-full relative z-10" height="200" src="https://ca-times.brightspotcdn.com/dims4/default/e178207/2147483647/strip/true/crop/1600x1066+0+0/resize/2000x1333!/format/webp/quality/75/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fca%2Fb5%2F9b66af844acc81746c3651efd2aa%2Fgrok-elon-musk-ai-circle.gif" width="200"/>-->
+      <div id="additional-profiles" class="flex space-x-4"></div>
+    </div>
+  </div>
+
+  <div id="chat" class="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white p-4 rounded-lg w-11/12 max-w-md h-64 flex flex-col">
+    <div id="chat-messages" class="flex-1 overflow-y-auto mb-2">
+      <!-- Chat messages will appear here -->
+    </div>
+    <div class="flex">
+      <input id="chat-input" type="text" class="flex-1 p-2 rounded-l-lg bg-black text-white" placeholder="Type a message..."/>
+      <button id="send-button" class="bg-gray-800 text-white px-4 py-2">Send</button>
+      <button id="tts-button" class="bg-gray-800 text-white px-4 py-2"><i class="fas fa-volume-up"></i></button>
+      <button id="stt-button" class="bg-gray-800 text-white px-3 py-2 rounded-r-lg"><i class="fas fa-microphone"></i></button>
+    </div>
+  </div>
+
+ <!-- <div class="flex space-x-4 mb-4">
+    <button id="hang-up" class="bg-red-600 text-white px-4 py-2 rounded-full flex items-center space-x-2">
+      <i class="fas fa-phone-slash"></i>
+      <span>Hang Up</span>
+    </button>-->
+    <!-- <button id="add-people" class="bg-green-600 text-white px-4 py-2 rounded-full flex items-center space-x-2">
+      <i class="fas fa-user-plus"></i>
+      <span>Add People</span>-->
+    </button>
+  </div>
+
+  <div id="call-ended" class="hidden absolute inset-0 bg-gray-900 flex items-center justify-center text-white text-2xl fade-in">
+    <p>Call Ended!</p>
+  </div>
+
+  <div id="add-people-menu" class="hidden absolute inset-0 bg-gray-900 flex items-center justify-center text-white text-2xl fade-in">
+    <p>Adding people to the call...</p>
+  </div>
+
+  <div id="more-options-menu" class="hidden absolute inset-0 bg-gray-900 flex items-center justify-center text-white text-2xl fade-in">
+    <p>More options coming soon...</p>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import { GoogleGenerativeAI } from "@google/generative-ai";
+
+    const API_KEY = "AIzaSyDbbYQJ7haZdA74z8RVLoUJyVNgzTacwJk";
+
+    const genAI = new GoogleGenerativeAI(API_KEY);
+
+    async function run() {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const chatContainer = document.getElementById("chat-messages");
+
+      const inputField = document.getElementById("chat-input");
+      const sendButton = document.getElementById("send-button");
+      const ttsButton = document.getElementById("tts-button");
+      const sttButton = document.getElementById("stt-button");
+      const reactiveCircle = document.getElementById("reactive-circle");
+
+      let speechSynthesisUtterance;
+      let recognition;
+      let isListening = false;
+
+      async function sendMessage() {
+        const userMessageText = inputField.value.trim();
+        if (userMessageText !== "") {
+          const userMessage = document.createElement("div");
+          userMessage.classList.add("message", "user-message");
+          userMessage.textContent = "User: " + userMessageText;
+          chatContainer.appendChild(userMessage);
+
+          const chat = model.startChat({
+            history: [
+              {
+                role: "user",
+                parts: [{ text: userMessageText }],
+              },
+            ],
+            generationConfig: {
+              maxOutputTokens: 100,
+            },
+          });
+
+          const result = await chat.sendMessage(userMessageText);
+          const response = await result.response;
+          const text = await response.text();
+
+          const botMessage = document.createElement("div");
+          botMessage.classList.add("message", "bot-message");
+          botMessage.textContent = "Bot: " + text;
+          chatContainer.appendChild(botMessage);
+
+          inputField.value = "";
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+
+          // Text-to-Speech for bot response
+          speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+          speechSynthesisUtterance.volume = 1.0; // max volume (range is 0.0 to 1.0)
+          speechSynthesisUtterance.onstart = () => {
+            reactiveCircle.classList.remove('hidden');
+          };
+          speechSynthesisUtterance.onend = () => {
+            reactiveCircle.classList.add('hidden');
+          };
+          speechSynthesis.speak(speechSynthesisUtterance);
+        }
+      }
+
+      function toggleSpeech() {
+        if (speechSynthesisUtterance) {
+          if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+          } else {
+            speechSynthesis.speak(speechSynthesisUtterance);
+          }
+        }
+      }
+
+      function startSpeechRecognition() {
+        if (!recognition) {
+          recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+          recognition.continuous = false;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US';
+
+          recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+              .map(result => result[0])
+              .map(result => result.transcript)
+              .join('');
+
+            inputField.value = transcript;
+
+            if (event.results[0].isFinal) {
+              // Display the transcription in the chat
+              const userMessage = document.createElement("div");
+              userMessage.classList.add("message", "user-message");
+              userMessage.textContent = "User: " + transcript;
+              chatContainer.appendChild(userMessage);
+
+              sendMessage();
+            }
+          };
+
+          recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+          };
+        }
+
+        if (isListening) {
+          recognition.stop();
+          sttButton.classList.remove('mic-on');
+        } else {
+          recognition.start();
+          sttButton.classList.add('mic-on');
+        }
+
+        isListening = !isListening;
+      }
+
+      inputField.addEventListener("keydown", async (event) => {
+        if (event.key === "Enter") {
+          await sendMessage();
+        }
+      });
+
+      sendButton.addEventListener("click", async () => {
+        await sendMessage();
+      });
+
+      ttsButton.addEventListener("click", toggleSpeech);
+      sttButton.addEventListener("click", startSpeechRecognition);
+    }
+
+    run();
+  </script>
+
+  <script>
+    const visualizer = document.getElementById('visualizer');
+    const addPeopleButton = document.getElementById('add-people');
+    const hangUpButton = document.getElementById('hang-up');
+    const moreOptionsButton = document.getElementById('more-options');
+    const analyzeDocumentButton = document.getElementById('analyze-document');
+    const homeButton = document.getElementById('home-button');
+    const clearChatButton = document.getElementById('clear-chat');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const additionalProfiles = document.getElementById('additional-profiles');
+
+    const callEnded = document.getElementById('call-ended');
+    const addPeopleMenu = document.getElementById('add-people-menu');
+    const moreOptionsMenu = document.getElementById('more-options-menu');
+    const chat = document.getElementById('chat');
+
+    let audioContext;
+    let analyser;
+    let dataArray;
+    let source;
+
+    function startVisualizer() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(stream => {
+            source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+            visualize();
+          })
+          .catch(err => {
+            console.error('Error accessing audio stream:', err);
+          });
+      }
+    }
+
+    function visualize() {
+      requestAnimationFrame(visualize);
+      analyser.getByteFrequencyData(dataArray);
+
+      const bars = visualizer.children;
+      for (let i = 0; i < bars.length; i++) {
+        const barHeight = dataArray[i] / 2;
+        bars[i].style.height = `${barHeight}px`;
+      }
+    }
+
+    function hangUp() {
+      callEnded.classList.remove('hidden');
+      setTimeout(() => {
+        callEnded.classList.add('hidden');
+      }, 2000);
+    }
+
+    function showAddPeopleMenu() {
+      const newProfile = document.createElement('img');
+      newProfile.src = 'https://storage.googleapis.com/a1aa/image/ECGKFnDUTBZYO1G13UmOHyFjvKlCVk7wxE09KGKqGbGTWUeJA.jpg';
+      newProfile.alt = 'New profile picture';
+      newProfile.className = 'w-32 h-32 rounded-full';
+      additionalProfiles.appendChild(newProfile);
+    }
+
+    function showMoreOptionsMenu() {
+      moreOptionsMenu.classList.remove('hidden');
+      setTimeout(() => {
+        moreOptionsMenu.classList.add('hidden');
+      }, 2000);
+    }
+
+    function toggleChat() {
+      chat.classList.toggle('hidden');
+    }
+
+    function sendMessage() {
+      const message = chatInput.value.trim();
+      if (message) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        chatMessages.appendChild(messageElement);
+        chatInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    }
+
+    function resetApp() {
+      location.reload();
+    }
+
+    function clearChat() {
+      chatMessages.innerHTML = '';
+    }
+
+    addPeopleButton.addEventListener('click', showAddPeopleMenu);
+    hangUpButton.addEventListener('click', hangUp);
+    moreOptionsButton.addEventListener('click', showMoreOptionsMenu);
+    analyzeDocumentButton.addEventListener('click', () => {
+      alert('Analyze Document functionality coming soon...');
+    });
+    homeButton.addEventListener('click', resetApp);
+    clearChatButton.addEventListener('click', clearChat);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    // Show chat when clicking on "More" button
+    moreOptionsButton.addEventListener('click', toggleChat);
+  </script>
+</body>
+</html>

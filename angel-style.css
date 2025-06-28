@@ -1,0 +1,352 @@
+
+
+:root {
+  --bgColor: #000;
+  --bgColorLight: hsla(242, 86%, 24%, 1);
+  --textColor: hsla(242, 86%, 88%, 1);
+  --textColorDark: #000;
+  --paperColor: hsla(242, 86%, 44%, 1);
+  --paperColorDark: hsla(242, 86%, 34%, 1);
+  --shadowColorFaint: hsla(0, 0%, 0%, 0.2);
+}
+
+::selected {
+  color: var(--textColorDark);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bgColor);
+  background: linear-gradient(135deg, var(--bgColor), var(--bgColorLight));
+  color: var(--textColor);
+  font-family: 'Saira', sans-serif;
+  position: relative;
+}
+
+* {
+  box-sizing: border-box;
+  transition: all 0.12s cubic-bezier(0.42, 0.54, 0.22, 1.26);
+}
+
+#canvas {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+audio {
+  position: fixed;
+  left: 10px;
+  bottom: -10px;
+  width: calc(100% - 20px);
+}
+audio.active {
+  bottom: 10px;
+}
+
+#thefile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: 1;
+}
+
+label.file {
+  display: inline-block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  padding: 1rem 2rem;
+  border-radius: 4px;
+
+  background: var(--paperColor);
+  color: var(--textColor);
+  font-size: 1.25em;
+  font-weight: 700;
+  box-shadow: 0 20px 60px var(--shadowColorFaint);
+
+  cursor: pointer;
+}
+
+label.file:hover {
+  background: var(--paperColorDark);
+  transform: translate3d(-50%, -55%, 0);
+}
+
+label.file:active{
+    background: var(--paperColorDark);
+    transform: translate3d(-50%, -45%, 0);
+}
+
+label.file.normal{
+    transform: translate3d(10%, 50%, 0);
+    padding: 0.2rem 2rem;
+    font-size: 1rem;
+    top: 0;
+    left: 0;
+}
+/* Container for both title and description */
+/* Container for both title and description */
+#angel-wrapper {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  text-align: left;
+  z-index: 10;
+  max-width: 450px;
+}
+
+#typewriter-container {
+  font-size: 3rem;
+  font-family: 'Rajdhani', sans-serif;
+  color: white;
+  white-space: nowrap;
+  z-index: 11;
+  margin-bottom: 1.5rem;
+}
+
+/* A.N.G.E.L has 13 characters including the dots and spaces */
+#typewriter-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid white;
+  width: 0ch;
+  letter-spacing: 0.1rem;
+  animation: typing 2.6s steps(9, end) forwards, blink 0.7s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0ch; }
+  to { width: 9ch; } /* One ch per visible character */
+}
+
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+:root {
+  --bgColor: #000;
+  --bgColorLight: hsla(242, 86%, 24%, 1);
+  --textColor: hsla(242, 86%, 88%, 1);
+  --paperColor: hsla(242, 86%, 44%, 1);
+  --paperColorDark: hsla(242, 86%, 34%, 1);
+  --shadowColorFaint: hsla(0, 7%, 66%, 0.2);
+}
+
+/* full-screen gradient */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100vw; height: 100vh;
+  background: linear-gradient(135deg, var(--bgColor), var(--bgColorLight));
+  color: var(--textColor);
+  font-family: 'Saira', sans-serif;
+  position: relative;
+}
+
+/* THREE.js canvas */
+#canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+/* Typewriter & description */
+#angel-wrapper {
+  position: absolute; top: 50%; right: 5%;
+  transform: translateY(-50%);
+  z-index: 10; max-width: 450px;
+}
+#typewriter-container {
+  font-size: 3rem; font-family: 'Rajdhani', sans-serif;
+  white-space: nowrap; margin-bottom: 1.5rem;
+}
+#typewriter-text {
+  display: inline-block; overflow: hidden; white-space: nowrap;
+  border-right: 2px solid white;
+  width: 0ch; letter-spacing: 0.1rem;
+  animation: typing 2.6s steps(9,end) forwards,
+             blink 0.7s step-end infinite;
+}
+@keyframes typing { from { width: 0ch; } to { width: 9ch; } }
+@keyframes blink  { 50% { border-color: transparent; } }
+
+/* Reactive circle */
+.reactive-circle {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,255,0,0.5), rgba(0,255,0,0));
+  animation: react 1s infinite;
+  z-index: 9;
+}
+@keyframes react {
+  0%   { transform: scale(1) translate(-50%,-50%); opacity: 1; }
+  50%  { transform: scale(1.5) translate(-50%,-50%); opacity: .5; }
+  100% { transform: scale(1) translate(-50%,-50%); opacity: 1; }
+}
+.hidden { display: none !important; }
+
+/* ─── Chat controls sits just below the description ─── */
+#angel-wrapper {
+  position: absolute;
+  bottom: 8rem;
+  right: 15rem;
+  max-width: 600px; /* increased */
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  color: var(--textColor);
+  
+}
+
+#typewriter-container {
+  font-size: 2.2rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: bold;
+  color: white;
+  text-align: left;
+}
+
+#angel-description {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Chat Controls like ChatGPT */
+#chat-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* ensures equal spacing */
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  flex-wrap: nowrap; /* prevent wrapping */
+  overflow: hidden;   /* hide overflow if needed */
+}
+
+
+#chat-input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+#chat-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#chat-controls button {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+#chat-controls button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#chat-controls button:active {
+  transform: scale(0.95);
+}
+.chat-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  height: 250px;               /* ✅ Set default visible height */
+  max-height: 40vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+  min-height: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+
+
+/* Messages */
+.chat-message {
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  max-width: 80%;
+  word-wrap: break-word;
+  font-size: 0.9rem;
+}
+
+.user-message {
+  align-self: flex-end;
+  background: #007acc;
+}
+
+.bot-message {
+  align-self: flex-start;
+  background: #444;
+}
+<style>
+  .reactive-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 255, 0, 0.5), rgba(0, 255, 0, 0));
+    animation: react 1s infinite;
+  }
+
+  @keyframes react {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .fade-in {
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+

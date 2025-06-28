@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>A.N.G.E.L Visualizer</title>
+  <link rel="stylesheet" href="visualizer-styles.css" />
+  <link href="https://fonts.googleapis.com/css?family=Saira" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+ <!-- A.N.G.E.L. Title -->
+<div id="angel-inside">A.N.G.E.L.</div>
+
+<!-- Subtitle / Description -->
+<div id="angel-subtitle">(ARTIFICIAL NEUROCOMPUTING GENERAL EXPERT LISTENER)</div>
+
+<!-- HTML -->
+<div id="angel-inside">A.N.G.E.L.</div>
+
+<div id="angel-description">An adaptive AI built for mission-critical operations, offering real-time audio-visual interaction, contextual awareness, and expert decision support in high-stress environments.</div>
+<button id="mute-btn" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999;">
+  🔊
+</button>
+
+<style>
+  /* Title Styling */
+  #angel-inside {
+    position: fixed;
+    top: 25rem; /* moved up */
+    right: 0.5rem;
+    color: rgb(65, 255, 246);
+    font-size: 10.5rem;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 2px solid white;
+    z-index: 9999;
+    animation: typewriter 2.5s steps(9, end) forwards, blink 0.75s step-end infinite;
+  }
+
+  /* Subtitle Styling */
+  #angel-subtitle {
+    position: fixed;
+    top: calc(15rem + 10.5rem + 0.5rem); /* below title */
+    right: 36rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.25rem;
+    font-family: 'Orbitron', sans-serif;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+
+  /* Description Styling (3rd line) */
+  #angel-description {
+    position: fixed;
+    top: calc(25rem + 10.5rem + 2.5rem); /* below subtitle */
+    right: 27rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    max-width: 500px;
+    font-family: 'Orbitron', sans-serif;
+    z-index: 9999;
+    white-space: wrap;
+    text-align: left;
+  }
+
+  /* Animations */
+  @keyframes typewriter {
+    from { width: 0; }
+    to { width: 9ch; }
+  }
+
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+</style>
+
+  <style>
+    #chat-frame {
+      position: fixed;
+      z-index: 9999;
+      width: 600px;
+      max-width: 90vw;
+      height: 400px;
+      max-height: 90vh;
+      border: none;
+      border-radius: 1rem;
+      overflow: hidden;
+      top: 65%;
+      right: 16rem;
+      transform: translateY(-50%);
+      box-shadow: 0 0 20px rgba(19, 76, 129, 0.4);
+      background: black;
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+</head>
+
+<body style="margin: 0; padding: 0; overflow: hidden;">
+
+  
+
+  <!-- Three.js canvas container -->
+  <div id="out"></div>
+
+  <!-- Chat UI iframe -->
+  <iframe src="chat-module.html" id="chat-frame"></iframe>
+
+  <!-- Hidden Audio -->
+  <audio id="audio" src="PortfolioWorldWeb.mp3" autoplay playsinline style="display: none;"></audio>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js"></script>
+  <script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.3/dat.gui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.3.0/simplex-noise.min.js"></script>
+
+  <!-- App Scripts -->
+  <script type="module" src="main.js"></script>
+  <script src="visualizer.js"></script>
+  <script src="script.js"></script>
+
+  <!-- 🔊 Dummy Visualizer Trigger for TTS -->
+  <script>
+    function startFakeVisualizer(duration = 2000) {
+      const context = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      const analyser = context.createAnalyser();
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(200, context.currentTime);
+      gainNode.gain.setValueAtTime(0.3, context.currentTime);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(analyser);
+      analyser.connect(context.destination);
+
+      oscillator.start();
+      setTimeout(() => oscillator.stop(), duration);
+    }
+  </script>
+<script>
+  let muted = false;
+
+  document.getElementById('music-toggle').addEventListener('click', () => {
+    try {
+      const gainNode = window.setGainNode();
+      muted = !muted;
+      gainNode.gain.setValueAtTime(muted ? 0 : 1, gainNode.context.currentTime);
+      document.getElementById("music-icon").className = muted ? "bx bx-volume-mute" : "bx bx-volume-full";
+    } catch (e) {
+      console.error("Gain node not available yet.");
+    }
+  });
+</script>
+<Script>let globalGainNode = null; // Global reference for mute control
+
+window.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "toggle-mute") {
+    if (globalGainNode) {
+      const isMuted = event.data.muted;
+      globalGainNode.gain.setValueAtTime(isMuted ? 0 : 1, globalGainNode.context.currentTime);
+    }
+  }
+});
+</Script>
+</body>
+</html>
