@@ -181,6 +181,75 @@ muteBtn.onmouseup = () => (muteBtn.style.transform = "scale(1)");
     var lowerAvgFr = lowerAvg / lowerHalfArray.length;
     var upperAvgFr = upperAvg / upperHalfArray.length;
 
+function render() {
+  analyser.getByteFrequencyData(dataArray);
+
+  const isSilent = dataArray.every(val => val === 0);
+  const t = performance.now() * 0.001;
+
+  let lowerMaxFr, lowerAvgFr, upperAvgFr;
+
+  if (isSilent) {
+    // Gentle breathing animation
+    lowerMaxFr = 0.1 + Math.abs(Math.sin(t * 0.5)) * 0.03;
+    lowerAvgFr = 0.08 + Math.abs(Math.cos(t * 0.4)) * 0.03;
+    upperAvgFr = 0.06 + Math.abs(Math.sin(t * 0.3)) * 0.02;
+  } else {
+    const lowerHalfArray = dataArray.slice(0, dataArray.length / 2 - 1);
+    const upperHalfArray = dataArray.slice(dataArray.length / 2 - 1);
+
+    const lowerMax = max(lowerHalfArray);
+    const lowerAvg = avg(lowerHalfArray);
+    const upperAvg = avg(upperHalfArray);
+
+    lowerMaxFr = lowerMax / lowerHalfArray.length;
+    lowerAvgFr = lowerAvg / lowerHalfArray.length;
+    upperAvgFr = upperAvg / upperHalfArray.length;
+  }
+
+  // Animate roughness and scaling
+  makeRoughBall(
+    ball,
+    modulate(Math.pow(lowerMaxFr, 0.8), 0, 1, 0, 8),
+    modulate(upperAvgFr, 0, 1, 0, 4)
+  );
+
+  const scale = modulate(lowerAvgFr, 0, 1, 1, 1.4);
+  ball.scale.set(scale, scale, scale);
+  glow.scale.set(scale * 1.5, scale * 1.5, scale * 1.5);
+
+  // Warp logic
+  if (!isSilent && lowerMaxFr > 0.3) {
+    warpMode = true;
+    warpStrength = modulate(lowerMaxFr, 0.5, 1, 0.0005, 0.004);
+  } else {
+    warpMode = false;
+    warpStrength *= 0.98;
+  }
+
+  // Particle motion
+  particles.vertices.forEach((v) => {
+    const dir = v.clone().normalize();
+    const movement = isSilent ? 0.001 : warpMode ? warpStrength : 0;
+    v.add(dir.multiplyScalar(movement));
+
+    if (v.length() > 150) {
+      v.set(
+        (Math.random() - 0.5) * 100,
+        (Math.random() - 0.5) * 100,
+        (Math.random() - 0.5) * 100
+      );
+    }
+  });
+
+  particles.verticesNeedUpdate = true;
+  renderer.render(scene, camera);
+  requestAnimationFrame(render);
+}
+
+
+
+    
     makeRoughBall(
       ball,
       modulate(Math.pow(lowerMaxFr, 0.8), 0, 1, 0, 8),
@@ -244,9 +313,8 @@ muteBtn.onmouseup = () => (muteBtn.style.transform = "scale(1)");
     mesh.geometry.computeFaceNormals();
   }
 
-  if (!visualizerStarted) {
-  render();  // Starts only when the mute button is first clicked
-  visualizerStarted = true;
+   {
+  render(); // Start it regardless of audio
 }
 ;
 
@@ -304,5 +372,17 @@ window.addEventListener("message", (event) => {
       const volume = event.data.muted ? 0 : 1;
       gainNode.gain.setValueAtTime(volume, gainNode.context.currentTime);
     }
+  }
+});
+let triggerVisualizer = false;
+let triggerTimeout = null;
+
+window.addEventListener("message", (event) => {
+  if (event.data?.type === "triggerAnimation") {
+    triggerVisualizer = true;
+    clearTimeout(triggerTimeout);
+    triggerTimeout = setTimeout(() => {
+      triggerVisualizer = false;
+    }, 2000); // Animation lasts 2s
   }
 });
