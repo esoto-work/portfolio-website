@@ -5,11 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portfolio Website</title>
   <link rel="stylesheet" href="style.css" />
-  
-  <link
-    href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet"></link>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
   
   <script type="importmap">
     {
@@ -31,35 +28,35 @@
     <nav class="navbar">
       <a href="#home">Home</a>
       <a href="#about">About</a>
-      <a href="#services">Service</a>
+      <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
     </nav>
 
-    <button id="music-toggle" class="apply-now-btn" title="Toggle Music">
-  <i id="music-icon" class='bx bx-volume-full'></i>
-</button>
-
-<script>
-  const button = document.getElementById('music-toggle');
-  let isMuted = false;
-
-  button.addEventListener('click', () => {
-    isMuted = !isMuted;
-
-    // Send message to iframe
-    const frame = document.getElementById('visualizer-frame');
-    frame.contentWindow.postMessage({ type: 'toggle-mute', muted: isMuted }, '*');
-
-    document.getElementById("music-icon").className = isMuted ? "bx bx-volume-mute" : "bx bx-volume-full";
-  });
-</script>
-
-
   </header>
 
-  <section id="globe-section">
+
+
+  <section class="home" id="home">
     <div id="globe-container"></div>
   </section>
+<div class="home-content">
+      <h1>Hi, It's <span>Eddie</span></h1>
+      <h3>I'm a <span>System Administrator & Developer</span></h3>
+      <p>I'm Eddie Soto, a System Administrator and Developer with a passion for building secure, efficient, and future-ready systems. With a background in Information Systems and hands-on experience in cybersecurity, web development, and infrastructure management, I bring both technical depth and creative problem-solving to every project I work on.</p>
+      <div class="social-icons">
+        <a href="#"><i class="bx bxl-github"></i></a>
+        <a href="#"><i class="bx bxl-linkedin-square"></i></a>
+        <a href="#"><i class="bx bxl-instagram-alt"></i></a>
+        <a href="#"><i class="bx bxl-whatsapp"></i></a>
+      </div>
+      <div class="btm-group">
+        <a href="#" class="btn">Hire</a>
+        <a href="#contact" class="btn btn-outline">Contact</a>
+      </div>
+    </div>
+    <div class="home-img">
+      <img src="image.jpg" alt="">
+    </div>
 
   <div class="ticker-section">
   <div class="ticker-wrap">
@@ -75,7 +72,7 @@
 
 
 <!-- 📊 Visualizer Embed -->
-<section id="visualizer-section" style="width: 100%; height: 100vh; overflow: hidden; margin: 0; padding: 0;">
+<section id="projects" style="width: 100%; height: 100vh; overflow: hidden; margin: 0; padding: 0;">
 
   <iframe 
     src="visualizer-module.html" 
@@ -85,61 +82,246 @@
     allow="autoplay"
   ></iframe>
 </section>
+  
+<style>
+  section#about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 60px;
+    padding: 100px 5%;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    background-color: #000;
+    font-family: 'Orbitron', sans-serif;
+  }
 
-  <section class="home" id="home">
-    <div class="home-content">
-      <h1>Hi, It's <span>Eddie</span></h1>
-      <h3>I'm a <span>System Administrator & Developer</span></h3>
-      <p>I'm Eddie Soto, a System Administrator and Developer with a passion for building secure, efficient, and future-ready systems. With a background in Information Systems and hands-on experience in cybersecurity, web development, and infrastructure management, I bring both technical depth and creative problem-solving to every project I work on.</p>
-      <div class="social-icons">
-        <a href="#"><i class="bx bxl-github"></i></a>
-        <a href="#"><i class="bx bxl-linkedin-square"></i></a>
-        <a href="#"><i class="bx bxl-instagram-alt"></i></a>
-        <a href="#"><i class="bx bxl-twitter"></i></a>
-      </div>
-      <div class="btm-group">
-        <a href="#" class="btn">Hire</a>
-        <a href="#contact" class="btn btn-outline">Contact</a>
-      </div>
-    </div>
-    <div class="home-img">
-      <img src="image.jpg" alt="">
-    </div>
-  </section>
+  #coin-container {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    z-index: 2;
+  }
 
-  <section class="about" id="about">
-  <div class="about-img">
-    <img src="image.jpg" alt="">
-  </div>
-  <div class="about-content">
-    <h2 class="typewriter-container"><span id="typewriter-text">A.N.G.E.L</span></h2>
+  .about-content {
+    text-align: left;
+    z-index: 3;
+    margin-left: -800px;
+  }
 
-    <a href="#" class="btn">Read More</a>
+  .about-content h2 {
+    font-size: 64px;
+    color: #00f0ff;
+    font-weight: 800;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    line-height: 1.1;
+    text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+  }
+
+  .about-content p {
+    color: #ccc;
+    font-size: 18px;
+    max-width: 500px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    text-shadow: 0 0 6px #00f0ff33;
+  }
+
+  .about-content a.btn {
+    display: inline-block;
+    border: 2px solid #00f0ff;
+    color: #00f0ff;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    box-shadow: 0 0 15px #00f0ff;
+    background: transparent;
+    transition: 0.3s ease;
+  }
+
+  .about-content a.btn:hover {
+    background-color: #00f0ff;
+    color: #000;
+    box-shadow: 0 0 25px #00f0ff;
+  }
+
+  @media (max-width: 768px) {
+    section#about {
+      grid-template-columns: 1fr;
+      text-align: center;
+      padding: 60px 5%;
+    }
+
+    .about-content {
+      margin-left: 0;
+      text-align: center;
+    }
+
+    .about-content h2 {
+      font-size: 48px;
+    }
+
+    .about-content p {
+      margin: 0 auto 30px;
+    }
+  }
+</style>
+
+
+  <!-- Optional decorative wireframe sphere background -->
+  <div class="absolute inset-0 z-0">
+    <!-- Optional: use CSS/Canvas background or wireframe globe behind coin -->
   </div>
 </section>
 
-  <section class="services" id="services">
-    <h2 class="heading">Services</h2>
-    <div class="services-container">
-      <div class="service-box">
-        <div class="service-info">
-          <i class="bx bx-code"></i>
-          <h4>System Administrator</h4>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab laborum perferendis fugiat fuga eum laudantium corrupti! Quia enim non expedita, dolores doloribus possimus accusamus, eaque quas numquam iusto dolorum nesciunt.</p>
-        </div>
-      </div>
-      <div class="service-box">
-        <div class="service-info">
-          <i class="bx bx-code-curly"></i>
-          <h4>Developer</h4>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab laborum perferendis fugiat fuga eum laudantium corrupti! Quia enim non expedita, dolores doloribus possimus accusamus, eaque quas numquam iusto dolorum nesciunt.</p>
-        </div>
+
+  <!-- Orbitron font (place in <head> if not already present) -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+
+<style>
+  section.services {
+    padding: 10px 5%;
+    font-family: 'Orbitron', sans-serif;
+    background: transparent;
+    text-align: left;
+  }
+
+  .services .heading {
+  font-size: 80px;
+  font-weight: 800;
+  color: #00f0ff;
+  margin-bottom: 60px;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+  text-align: left;
+  margin-left: 0;          /* reset any auto-centering */
+  padding-left: 10px;      /* optional: nudge it left slightly */
+}
+
+
+  .services-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 40px;
+  }
+
+  .service-box {
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid #00f0ff22;
+    padding: 30px;
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 0 15px #00f0ff33;
+    transition: 0.3s ease;
+  }
+
+  .service-box:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 25px #00f0ff66;
+  }
+
+  .service-info i {
+    font-size: 42px;
+    color: #00f0ff;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .service-info h4 {
+    font-size: 24px;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 15px;
+    color: #00f0ff;
+  }
+
+  .service-info p {
+    font-size: 16px;
+    font-family: 'Orbitron', sans-serif;
+    color: #ccc;
+    line-height: 1.5;
+    text-shadow: 0 0 4px #00f0ff22;
+  }
+
+  @media (max-width: 768px) {
+    .services .heading {
+      font-size: 42px;
+    }
+
+    .service-box {
+      width: 100%;
+      max-width: 90%;
+    }
+  }
+</style>
+
+ <div class="ticker-section">
+  <div class="ticker-wrap">
+    <div class="ticker-move">
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+<!-- repeat more rows as needed -->
+    </div>
+  </div>
+</div>
+
+<section class="services" id="kattcoin">
+  
+  <h2 class="heading">About Me</h2>
+  
+  <div class="services-container">
+    <div class="about-img">
+    <img src="image.jpg" alt="Eddie's profile photo">
+  </div>
+    <div class="service-box">
+      <div class="service-info">
+        <i class="bx bx-bitcoin"></i>
+        <h4>CRYPTO</h4>
+        <p>Crypto introduced me to encryption and secure systems, sparking my passion for cybersecurity and digital asset protection.</p>
       </div>
     </div>
-  </section>
+
+    <div class="service-box">
+      <div class="service-info">
+        <i class="bx bx-shield-quarter"></i>
+        <h4>CYBERSEC</h4>
+        <p>I want to earn a master’s in cybersecurity to sharpen my skills and take on advanced roles defending systems and infrastructure.</p>
+      </div>
+    </div>
+
+    <div class="service-box">
+      <div class="service-info">
+        <i class="bx bx-rocket"></i>
+        <h4>PORTFOLIO</h4>
+        <p>This is my personal portfolio, showcasing my work and skills in system development. Its a work in progress but in the future, I plan to include more projects and details about my experience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style></style>
 
 
-  <section class="contact" id="contact">
+<div class="ticker-section">
+  <div class="ticker-wrap">
+    <div class="ticker-move">
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+<!-- repeat more rows as needed -->
+    </div>
+  </div>
+</div>
+
+<section class="contact" id="contact">
+
+  
     <h2 class="heading">Contact <span>Me</span></h2>
     <form action="">
       <div class="input-group">
@@ -156,7 +338,19 @@
       <textarea cols="30" rows="10" placeholder="Your Message"></textarea>
       <input type="Submit" value="Send Message" class="btn">
     </form>
-  </section>
+</section>
+
+ <div class="ticker-section">
+  <div class="ticker-wrap">
+    <div class="ticker-move">
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+      <span>SQL</span><span>Python</span><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Solidity</span><span>Cyberspace</span><span>Linux</span>
+<!-- repeat more rows as needed -->
+    </div>
+  </div>
+</div>
 
   <footer class="footer">
     <div class="social-icons">
