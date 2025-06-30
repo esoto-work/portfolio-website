@@ -240,6 +240,7 @@ button:hover {
           speechSynthesisUtterance.volume = 1.0; // max volume (range is 0.0 to 1.0)
           speechSynthesisUtterance.onstart = () => {
             reactiveCircle.classList.remove('hidden');
+            window.parent.postMessage({ type: 'activateVisualizer' }, '*');
           };
           speechSynthesisUtterance.onend = () => {
             reactiveCircle.classList.add('hidden');
@@ -431,6 +432,20 @@ button:hover {
 
     // Show chat when clicking on "More" button
     moreOptionsButton.addEventListener('click', toggleChat);
+
+    utterance.onstart = () => {
+  // Show reactive circle
+  reactiveCircle.classList.remove('hidden');
+
+  // 🔁 Send message to visualizer iframe to "start"
+  window.parent.postMessage({ type: 'start-visualizer' }, '*');
+};
+
+utterance.onend = () => {
+  reactiveCircle.classList.add('hidden');
+  window.parent.postMessage({ type: 'stop-visualizer' }, '*');
+};
+
   </script>
 </body>
 </html>
