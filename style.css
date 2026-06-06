@@ -193,16 +193,6 @@ section{
                 0 0 50px var(--main-color),
                 0 0 100px var(--main-color);
 }
-.about-content h2{
-    font-size: 7rem;
-    text-align: left;
-}
-.about-content p{
-    font-size: 1.8rem;
-}
-.about-content .btn{
-    margin: 3rem 0;
-}
 ::-webkit-scrollbar{
     width: 20px;
 }
@@ -295,6 +285,12 @@ font-size: 8rem;
     border: 2px solid var(--main-color);
     margin: 1.5rem 0;
     resize: none;
+}
+#form-status{
+    font-size: 1.5rem;
+    margin-top: 1.5rem;
+    text-align: center;
+    min-height: 1.5rem;
 }
 .footer{
     background-color: var(--bg-color);
@@ -472,32 +468,6 @@ font-size: 8rem;
   letter-spacing: 0.1rem;
 }
 
-.typewriter-container {
-  font-size: rem;
-  color: white;
-  font-family: 'Saira', sans-serif;
-}
-
-#typewriter-text {
-  font-family: 'Space Grotesk', monospace;
-  letter-spacing: 0rem;
-  display: inline-block;
-  color: white;
-  overflow: hidden;
-  white-space: nowrap;
-  border-right: 1px solid white;
-  animation: typing 2.5s steps(9, end) forwards, blink 0.7s step-end infinite;
-  width: 0ch;
-}
-
-@keyframes typing {
-  from { width: 0ch }
-  to { width: 9ch }
-}
-
-@keyframes blink {
-  50% { border-color: transparent; }
-}
 
 /* === A.N.G.E.L. MODULE STYLES START === */
 .ticker-section {
@@ -640,11 +610,105 @@ font-size: 8rem;
   .btn-group {
     flex-direction: column;
   }
-  .about-content h2,
   .heading {
     font-size: 5rem;
   }
   .service-info p {
     font-size: 1.2rem;
   }
+}
+
+/* =========================================================================
+   FLUID RESPONSIVE LAYER  (added last so it wins the cascade)
+   - clamp() typography scales smoothly with the viewport instead of jumping
+     at fixed breakpoints, so it fits any laptop/monitor width.
+   - The hero is constrained so it can never overflow above the viewport and
+     get clipped under the fixed header.
+   ========================================================================= */
+
+/* Projects / visualizer iframe — fills the viewport (dvh handles mobile chrome). */
+#projects {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 560px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+#visualizer-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Header music toggle button — styled to sit inline with the nav links. */
+.music-toggle {
+  background: transparent;
+  color: var(--text-color);
+  font-size: 2.4rem;
+  margin-left: 4rem;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  transition: 0.3s ease;
+}
+.music-toggle:hover,
+.music-toggle.active {
+  color: var(--main-color);
+  transform: scale(1.1);
+}
+
+/* Anchor jumps (#about, #contact…) shouldn't hide under the fixed header. */
+html {
+  scroll-padding-top: 12rem;
+}
+section {
+  scroll-margin-top: 10rem;
+}
+
+/* Fluid type — min, preferred (viewport-based), max. */
+.home-content h1 {
+  font-size: clamp(3.6rem, 2rem + 4.5vw, 6.5rem);
+  line-height: 1.05;
+}
+.home-content h3 {
+  font-size: clamp(2rem, 1rem + 2.2vw, 4rem);
+}
+.home-content p {
+  font-size: clamp(1.3rem, 1rem + 0.5vw, 1.6rem);
+  line-height: 1.7;
+}
+.heading {
+  font-size: clamp(3.5rem, 2rem + 4vw, 7rem);
+}
+
+/* Hero overlay: fluid width, vertically centered but never taller than the
+   space below the header — so the top of the H1 can't be clipped. */
+.home-content {
+  width: min(92vw, 520px);
+  max-height: calc(100vh - 14rem);
+}
+.home-content .social-icons {
+  margin: 2.4rem 0;
+}
+
+/* Height-based breakpoint: short laptop screens (the common case).
+   Tighten the hero so everything fits without scrolling/clipping. */
+@media (max-height: 820px) {
+  .home-content h1 { font-size: clamp(3.2rem, 1.5rem + 3.5vw, 5.2rem); }
+  .home-content h3 { font-size: clamp(1.8rem, 1rem + 1.6vw, 3rem); }
+  .home-content p  { font-size: 1.35rem; line-height: 1.55; }
+  .home-content .social-icons { margin: 1.6rem 0; }
+  .social-icons a { width: 60px; height: 60px; }
+  .social-icons a i { font-size: 3rem; }
+}
+
+@media (max-height: 640px) {
+  .home-content { top: 50%; max-height: calc(100vh - 9rem); }
+  .home-content p { display: none; } /* drop the bio on very short screens */
+  .home-content .social-icons { margin: 1.2rem 0; }
 }

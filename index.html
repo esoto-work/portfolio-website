@@ -3,33 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Defense-in-depth: locks which origins may load scripts/styles/images/etc.
+       Blocks injected (e.g. gambling) scripts. NOTE: GitHub Pages can't send HTTP
+       headers, so CSP is delivered via this meta tag. Front with Cloudflare for
+       full headers (X-Frame-Options, X-Content-Type-Options, HSTS) + a WAF. -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    base-uri 'self';
+    object-src 'none';
+    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
+    font-src 'self' https://fonts.gstatic.com https://unpkg.com;
+    img-src 'self' data:;
+    connect-src 'self';
+    frame-src 'self';
+    frame-ancestors 'self';
+    form-action 'self';
+    upgrade-insecure-requests;
+  " />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Portfolio Website</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet"></link>
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" integrity="sha384-42kyIPf7HDYLkGffmxDhSx/3Z/53wGBs3nD6wEFxsbeDc7rMO6mkYbkAcpRsnMU2" crossorigin="anonymous"/>
   
   <script type="importmap">
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.170/build/three.module.js",
         "jsm/": "https://cdn.jsdelivr.net/npm/three@0.170/examples/jsm/"
+      },
+      "integrity": {
+        "https://cdn.jsdelivr.net/npm/three@0.170/build/three.module.js": "sha384-GY5FqjttLCFRt/McQbyaVdCk2O1IQtOeX8Py6NfD89BIAsIyJFRl4UgSXrk2vXAk",
+        "https://cdn.jsdelivr.net/npm/three@0.170/examples/jsm/controls/OrbitControls.js": "sha384-aJoe4qqS/DgF2jh9njAuvA6QIveJYoCuYOfYjdFY8P3eawzmc9bEQ40jq2TvOyuP"
       }
     }
   </script>
 </head>
 <body>
 
-  <!-- 🎵 Background Music -->
-  <audio id="bg-music" src="" autoplay loop></audio>
-
   <header class="header">
-    <a href="#home" class="logo">Eddie Soto <span>Professional Portfolio</span></a>
+    <a href="#home" class="logo">Eddie S. <span>Cyber Operations</span></a>
     <i class="bx bx-menu" id="menu-icon"></i>
     <nav class="navbar">
       <a href="#home">Home</a>
-      <a href="#kattcoin">About</a>
+      <a href="#about">About</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
+      <button id="music-toggle" class="music-toggle" aria-label="Toggle background music" title="Toggle music">
+        <i class="bx bx-volume-mute"></i>
+      </button>
     </nav>
 
   </header>
@@ -44,10 +67,8 @@
       <h3>I'm a <span>System Administrator & Developer</span></h3>
       <p>I'm Eddie Soto, a System Administrator and Developer with a passion for building secure, efficient, and future-ready systems. With a background in Information Systems and hands-on experience in cybersecurity, web development, and infrastructure management, I bring both technical depth and creative problem-solving to every project I work on.</p>
       <div class="social-icons">
-  <a href="https://github.com/esoto-work" target="_blank"><i class="bx bxl-github"></i></a>
-  <a href="https://www.linkedin.com/in/eddie-soto-0a7606338?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank"><i class="bx bxl-linkedin-square"></i></a>
-  <a href="https://www.instagram.com/vyxcy?utm_source=qr&igsh=dXN1czM4M2lmanVl" target="_blank"><i class="bx bxl-instagram-alt"></i></a>
-  <a href="https://wa.link/4xuygj" target="_blank"><i class="bx bxl-whatsapp"></i></a>
+  <a href="https://www.linkedin.com/in/eddie-scyber/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="bx bxl-linkedin-square"></i></a>
+  <a href="mailto:esoto.work@outlook.com" aria-label="Email"><i class="bx bx-envelope"></i></a>
 </div>
 
       <div class="btm-group">
@@ -71,189 +92,121 @@
 
 
 <!-- 📊 Visualizer Embed -->
-<section id="projects" style="width: 100%; height: 100vh; overflow: hidden; margin: 0; padding: 0;">
-
-  <iframe 
-    src="visualizer-module.html" 
+<section id="projects">
+  <!-- sandbox: even if this embedded content were ever compromised, it can't
+       redirect the top page to an exploit kit, open pop-ups, trigger downloads,
+       or load plugins. allow-same-origin is required for the same-origin
+       postMessage/audio wiring; allow-scripts for the 3D/visualizer. -->
+  <iframe
+    src="visualizer-module.html"
     id="visualizer-frame"
-    style="width: 100%; height: 100%; border: none;"
     loading="lazy"
     allow="autoplay"
+    sandbox="allow-scripts allow-same-origin"
   ></iframe>
 </section>
   
 <style>
-  section#about {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 60px;
-    padding: 100px 5%;
+  section.services {
+    position: relative;
     overflow: hidden;
+    padding: 6rem 5% 8rem;
+    font-family: 'Orbitron', sans-serif;
+    background: transparent;
+  }
+
+  /* Matrix digital-rain canvas, behind the content */
+  #matrix-rain {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .services .heading,
+  .services .about-layout {
     position: relative;
     z-index: 1;
-    background-color: #000;
-    font-family: 'Orbitron', sans-serif;
-  }
-
-  #coin-container {
-    width: 100%;
-    height: 500px;
-    position: relative;
-    z-index: 2;
-  }
-
-  .about-content {
-    text-align: left;
-    z-index: 3;
-    margin-left: -800px;
-  }
-
-  .about-content h2 {
-    font-size: 64px;
-    color: #00f0ff;
-    font-weight: 800;
-    letter-spacing: 4px;
-    margin-bottom: 20px;
-    line-height: 1.1;
-    text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-  }
-
-  .about-content p {
-    color: #ccc;
-    font-size: 18px;
-    max-width: 500px;
-    line-height: 1.6;
-    margin-bottom: 30px;
-    text-shadow: 0 0 6px #00f0ff33;
-  }
-
-  .about-content a.btn {
-    display: inline-block;
-    border: 2px solid #00f0ff;
-    color: #00f0ff;
-    padding: 12px 30px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 16px;
-    box-shadow: 0 0 15px #00f0ff;
-    background: transparent;
-    transition: 0.3s ease;
-  }
-
-  .about-content a.btn:hover {
-    background-color: #00f0ff;
-    color: #000;
-    box-shadow: 0 0 25px #00f0ff;
-  }
-
-  @media (max-width: 768px) {
-    section#about {
-      grid-template-columns: 1fr;
-      text-align: center;
-      padding: 60px 5%;
-    }
-
-    .about-content {
-      margin-left: 0;
-      text-align: center;
-    }
-
-    .about-content h2 {
-      font-size: 48px;
-    }
-
-    .about-content p {
-      margin: 0 auto 30px;
-    }
-  }
-</style>
-
-
-  <!-- Optional decorative wireframe sphere background -->
-  <div class="absolute inset-0 z-0">
-    <!-- Optional: use CSS/Canvas background or wireframe globe behind coin -->
-  </div>
-</section>
-
-
-  <!-- Orbitron font (place in <head> if not already present) -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
-
-<style>
-  section.services {
-    padding: 10px 5%;
-    font-family: 'Orbitron', sans-serif;
-    background: transparent;
-    text-align: left;
   }
 
   .services .heading {
-  font-size: 80px;
-  font-weight: 800;
-  color: #00f0ff;
-  margin-bottom: 60px;
-  font-family: 'Orbitron', sans-serif;
-  text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-  text-align: left;
-  margin-left: 0;          /* reset any auto-centering */
-  padding-left: 10px;      /* optional: nudge it left slightly */
-}
+    color: #00f0ff;
+    text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+    text-align: center;
+    margin-bottom: 5rem;
+  }
 
-
-  .services-container {
+  /* Photo on the left, the three skill cards on the right; wraps on smaller screens */
+  .about-layout {
     display: flex;
     flex-wrap: wrap;
-    justify-content: left;
-    gap: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(2rem, 4vw, 4.5rem);
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .about-img { flex: 0 0 auto; }
+  .about-img img {
+    width: clamp(240px, 26vw, 400px);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 0 25px var(--main-color);
+    transition: 0.4s ease-in-out;
+  }
+  .about-img img:hover {
+    box-shadow: 0 0 25px var(--main-color), 0 0 60px var(--main-color);
+  }
+
+  /* Three equal cards that flow into one column on narrow screens */
+  .services-container {
+    flex: 1 1 480px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 2rem;
   }
 
   .service-box {
     background: rgba(0, 255, 255, 0.05);
-    border: 1px solid #00f0ff22;
-    padding: 30px;
-    border-radius: 12px;
-    width: 320px;
-    box-shadow: 0 0 15px #00f0ff33;
+    border: 1px solid #00f0ff33;
+    border-radius: 1rem;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 0 15px #00f0ff22;
     transition: 0.3s ease;
+    height: 100%;
   }
-
   .service-box:hover {
     transform: translateY(-10px);
     box-shadow: 0 0 25px #00f0ff66;
+    border-color: var(--main-color);
   }
 
+  .service-info { text-align: center; }
   .service-info i {
-    font-size: 42px;
+    font-size: 4.5rem;
     color: #00f0ff;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
     display: block;
   }
-
   .service-info h4 {
-    font-size: 24px;
-    font-family: 'Orbitron', sans-serif;
-    margin-bottom: 15px;
+    font-size: 2rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 1rem;
     color: #00f0ff;
   }
-
   .service-info p {
-    font-size: 16px;
-    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
     color: #ccc;
-    line-height: 1.5;
-    text-shadow: 0 0 4px #00f0ff22;
+    line-height: 1.6;
   }
 
-  @media (max-width: 768px) {
-    .services .heading {
-      font-size: 42px;
-    }
-
-    .service-box {
-      width: 100%;
-      max-width: 90%;
-    }
+  @media (max-width: 992px) {
+    .services-container { flex-basis: 100%; }
   }
 </style>
 
@@ -269,35 +222,40 @@
   </div>
 </div>
 
-<section class="services" id="kattcoin">
-  
-  <h2 class="heading">About Me</h2>
-  
-  <div class="services-container">
+<section class="services" id="about">
+
+  <canvas id="matrix-rain" aria-hidden="true"></canvas>
+
+  <h2 class="heading">About <span>Me</span></h2>
+
+  <div class="about-layout">
     <div class="about-img">
-    <img src="image.jpg" alt="Eddie's profile photo">
-  </div>
-    <div class="service-box">
-      <div class="service-info">
-        <i class="bx bx-bitcoin"></i>
-        <h4>CRYPTO</h4>
-        <p>Crypto introduced me to encryption and secure systems, sparking my passion for cybersecurity and digital asset protection.</p>
-      </div>
+      <img src="image.jpg" alt="Eddie Soto">
     </div>
 
-    <div class="service-box">
-      <div class="service-info">
-        <i class="bx bx-shield-quarter"></i>
-        <h4>CYBERSEC</h4>
-        <p>I want to earn a master’s in cybersecurity to sharpen my skills and take on advanced roles defending systems and infrastructure.</p>
+    <div class="services-container">
+      <div class="service-box">
+        <div class="service-info">
+          <i class="bx bx-search-alt"></i>
+          <h4>Digital Forensics</h4>
+          <p>I investigate compromised systems and recover digital evidence — analyzing disks, memory, logs, and network artifacts to reconstruct exactly what happened and how.</p>
+        </div>
       </div>
-    </div>
 
-    <div class="service-box">
-      <div class="service-info">
-        <i class="bx bx-rocket"></i>
-        <h4>PORTFOLIO</h4>
-        <p>This is my personal portfolio, showcasing my work and skills in system development. Its a work in progress but in the future, I plan to include more projects and details about my experience.</p>
+      <div class="service-box">
+        <div class="service-info">
+          <i class="bx bx-shield-quarter"></i>
+          <h4>Cybersecurity</h4>
+          <p>I defend systems and infrastructure by hardening configurations, hunting threats, and closing vulnerabilities before they can be exploited.</p>
+        </div>
+      </div>
+
+      <div class="service-box">
+        <div class="service-info">
+          <i class="bx bx-crosshair"></i>
+          <h4>Cyber Operations</h4>
+          <p>I work across offensive and defensive cyber — from reconnaissance and detection to incident response — turning analysis into decisive, real-world action.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -322,20 +280,26 @@
 
   
     <h2 class="heading">Contact <span>Me</span></h2>
-    <form action="">
+    <form id="contact-form" novalidate>
       <div class="input-group">
         <div class="input-box">
-          <input type="text" placeholder="Full Name">
-          <input type="email" placeholder="Email">
+          <input type="text" name="name" placeholder="Full Name" required maxlength="100" autocomplete="name">
+          <input type="email" name="email" placeholder="Email" required maxlength="254" autocomplete="email">
         </div>
         <div class="input-box">
-          <input type="number" placeholder="Phone Number">
-          <input type="text" placeholder="Subject">
+          <input type="tel" name="phone" placeholder="Phone Number (optional)" maxlength="30" autocomplete="tel">
+          <input type="text" name="subject" placeholder="Subject" maxlength="150">
         </div>
       </div>
       <div class="input-group-2"></div>
-      <textarea cols="30" rows="10" placeholder="Your Message"></textarea>
-      <input type="Submit" value="Send Message" class="btn">
+      <textarea name="message" cols="30" rows="10" placeholder="Your Message" required maxlength="3000"></textarea>
+      <!-- Honeypot: hidden from humans; bots tend to fill every field. If this
+           has a value on submit, we silently drop the message as spam. -->
+      <input type="text" name="website" id="hp-website" tabindex="-1" autocomplete="off"
+             aria-hidden="true"
+             style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
+      <input type="submit" value="Send Message" class="btn">
+      <p id="form-status" role="status" aria-live="polite"></p>
     </form>
 </section>
 
@@ -354,76 +318,25 @@
   <footer class="footer">
     <div class="social-icons">
       <div class="social-icons">
-  <a href="https://github.com/esoto-work" target="_blank"><i class="bx bxl-github"></i></a>
-  <a href="https://www.linkedin.com/in/eddie-soto-0a7606338?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank"><i class="bx bxl-linkedin-square"></i></a>
-  <a href="https://www.instagram.com/vyxcy?utm_source=qr&igsh=dXN1czM4M2lmanVl" target="_blank"><i class="bx bxl-instagram-alt"></i></a>
-  <a href="https://wa.link/4xuygj" target="_blank"><i class="bx bxl-whatsapp"></i></a>
+  <a href="https://www.linkedin.com/in/eddie-scyber/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="bx bxl-linkedin-square"></i></a>
+  <a href="mailto:esoto.work@outlook.com" aria-label="Email"><i class="bx bx-envelope"></i></a>
 </div>
 
     </div>
     <ul class="list">
     <li><a href="#home">Home</a></li>
-    <li><a href="#kattcoin">About</a></li>
+    <li><a href="#about">About</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
     <p class="copyright">© Eddie Soto | All Rights Reserved</p>
   </footer>
 
-  <!-- 🎵 Unlock audio on user interaction -->
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const audio = document.getElementById("bg-music");
-      const unlockAudio = () => {
-        audio.play().catch(() => {});
-        document.removeEventListener("click", unlockAudio);
-        document.removeEventListener("touchstart", unlockAudio);
-      };
-      document.addEventListener("click", unlockAudio);
-      document.addEventListener("touchstart", unlockAudio);
-    });
-
-    <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const typewriter = document.getElementById("typewriter-text");
-    typewriter.textContent = "A.N.G.E.L";
-  });
-</script>
-
-  </script>
-
-  <script src="script.js"></script>
+  <!-- Landing page scripts. The audio visualizer + A.N.G.E.L assistant live in
+       the iframe (visualizer-module.html), which loads its own libraries. -->
+  <script src="menu.js"></script>
+  <script src="matrix.js"></script>
+  <script src="contact.js"></script>
   <script type="module" src="globe.js"></script>
-
-
-<!-- A.N.G.E.L Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js"></script>
-<script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.3/dat.gui.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.3.0/simplex-noise.min.js"></script>
-
-<script type="module" src="main.js"></script>
-<script src="visualizer.js"></script>
-<script src="script.js"></script>
-
-<script>
-  function startFakeVisualizer(duration = 2000) {
-    const context = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-    const analyser = context.createAnalyser();
-
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(200, context.currentTime);
-    gainNode.gain.setValueAtTime(0.3, context.currentTime);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(analyser);
-    analyser.connect(context.destination);
-
-    oscillator.start();
-    setTimeout(() => oscillator.stop(), duration);
-  }
-</script>
 </body>
 </html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    base-uri 'self';
+    object-src 'none';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data:;
+    frame-ancestors 'self';
+    form-action 'self';
+    upgrade-insecure-requests;
+  " />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>404 — Page Not Found | Eddie S.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0; height: 100%;
+      background: #050608; color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .wrap { padding: 2rem; }
+    h1 { font-size: clamp(4rem, 18vw, 9rem); margin: 0; color: #00f0ff;
+         text-shadow: 0 0 18px #00f0ff, 0 0 36px #00f0ff; }
+    p { color: #cfe9f5; font-size: clamp(1rem, 3vw, 1.4rem); margin: 1rem 0 2rem; }
+    a { display: inline-block; padding: 0.8rem 2rem; border: 2px solid #00f0ff;
+        color: #00f0ff; text-decoration: none; border-radius: 0.5rem;
+        box-shadow: 0 0 15px #00f0ff; transition: 0.3s ease; }
+    a:hover { background: #00f0ff; color: #000; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>404</h1>
+    <p>This page doesn't exist. Let's get you back on course.</p>
+    <a href="/">Return Home</a>
+  </div>
+</body>
+</html>

@@ -9,9 +9,15 @@ var vizInit = function () {
   var src = context.createMediaElementSource(audio);
   var analyser = context.createAnalyser();
 
-  src.connect(analyser);
-  analyser.connect(gainNode);
-  gainNode.connect(context.destination);
+  // Order matters: src -> gain -> analyser -> destination.
+  // With the analyser AFTER the gain node, muting the music (gain = 0) also makes
+  // the analyser read silence, so the orb stops reacting to muted music.
+  src.connect(gainNode);
+  gainNode.connect(analyser);
+  analyser.connect(context.destination);
+
+  // Start muted so the audio state matches the header button's default (🔇).
+  gainNode.gain.value = 0;
 
   analyser.fftSize = 512;
   var bufferLength = analyser.frequencyBinCount;
@@ -22,9 +28,10 @@ var vizInit = function () {
 muteBtn.id = "mute-btn";
 muteBtn.innerHTML = "🔇"; // 🔇 because it's muted by default
 Object.assign(muteBtn.style, {
+  display: "none", // hidden: the visible control is the header button in index.html
   position: "fixed",
-  top: "30rem",
-  right: "16rem",
+  top: "1.5rem",
+  right: "1.5rem",
   zIndex: "10000",
   backgroundColor: "#f15a29", // Orange
   color: "#fff",
@@ -78,8 +85,22 @@ muteBtn.onmouseup = () => (muteBtn.style.transform = "scale(1)");
   var group = new THREE.Group();
 
   var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(-60, 0, 100);
-  camera.lookAt(new THREE.Vector3(70, 0, 0));
+  function positionCamera() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const portraitOrMobile = h >= w || w <= 1024;
+    if (portraitOrMobile) {
+      // Portrait / mobile / tablet: center the orb horizontally and lift it into
+      // the upper area so the A.N.G.E.L title + chat panel sit below it.
+      camera.position.set(0, 0, 120);
+      camera.lookAt(new THREE.Vector3(0, -22, 0));
+    } else {
+      // Wide desktop: orb on the left, A.N.G.E.L panel on the right.
+      camera.position.set(-60, 0, 100);
+      camera.lookAt(new THREE.Vector3(70, 0, 0));
+    }
+  }
+  positionCamera();
   scene.add(camera);
 
   var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -166,114 +187,87 @@ muteBtn.onmouseup = () => (muteBtn.style.transform = "scale(1)");
 
   let warpMode = false;
   let warpStrength = 0;
+  let ttsActive = false;       // true while the chatbot (A.N.G.E.L) is speaking
+  let ttsTimeout = null;
 
-  function render() {
-    analyser.getByteFrequencyData(dataArray);
-
-    var lowerHalfArray = dataArray.slice(0, dataArray.length / 2 - 1);
-    var upperHalfArray = dataArray.slice(dataArray.length / 2 - 1, dataArray.length - 1);
-
-    var lowerMax = max(lowerHalfArray);
-    var lowerAvg = avg(lowerHalfArray);
-    var upperAvg = avg(upperHalfArray);
-
-    var lowerMaxFr = lowerMax / lowerHalfArray.length;
-    var lowerAvgFr = lowerAvg / lowerHalfArray.length;
-    var upperAvgFr = upperAvg / upperHalfArray.length;
-
-function render() {
-  analyser.getByteFrequencyData(dataArray);
-
-  const isSilent = dataArray.every(val => val === 0);
-  const t = performance.now() * 0.001;
-
-  let lowerMaxFr, lowerAvgFr, upperAvgFr;
-
-  if (isSilent) {
-    // Gentle breathing animation
-    lowerMaxFr = 0.1 + Math.abs(Math.sin(t * 0.5)) * 0.03;
-    lowerAvgFr = 0.08 + Math.abs(Math.cos(t * 0.4)) * 0.03;
-    upperAvgFr = 0.06 + Math.abs(Math.sin(t * 0.3)) * 0.02;
-  } else {
-    const lowerHalfArray = dataArray.slice(0, dataArray.length / 2 - 1);
-    const upperHalfArray = dataArray.slice(dataArray.length / 2 - 1);
-
-    const lowerMax = max(lowerHalfArray);
-    const lowerAvg = avg(lowerHalfArray);
-    const upperAvg = avg(upperHalfArray);
-
-    lowerMaxFr = lowerMax / lowerHalfArray.length;
-    lowerAvgFr = lowerAvg / lowerHalfArray.length;
-    upperAvgFr = upperAvg / upperHalfArray.length;
-  }
-
-  // Animate roughness and scaling
-  makeRoughBall(
-    ball,
-    modulate(Math.pow(lowerMaxFr, 0.8), 0, 1, 0, 8),
-    modulate(upperAvgFr, 0, 1, 0, 4)
-  );
-
-  const scale = modulate(lowerAvgFr, 0, 1, 1, 1.4);
-  ball.scale.set(scale, scale, scale);
-  glow.scale.set(scale * 1.5, scale * 1.5, scale * 1.5);
-
-  // Warp logic
-  if (!isSilent && lowerMaxFr > 0.3) {
-    warpMode = true;
-    warpStrength = modulate(lowerMaxFr, 0.5, 1, 0.0005, 0.004);
-  } else {
-    warpMode = false;
-    warpStrength *= 0.98;
-  }
-
-  // Particle motion
-  particles.vertices.forEach((v) => {
-    const dir = v.clone().normalize();
-    const movement = isSilent ? 0.001 : warpMode ? warpStrength : 0;
-    v.add(dir.multiplyScalar(movement));
-
-    if (v.length() > 150) {
-      v.set(
-        (Math.random() - 0.5) * 100,
-        (Math.random() - 0.5) * 100,
-        (Math.random() - 0.5) * 100
-      );
+  // The chat iframe posts these when A.N.G.E.L speaks. While it's talking, the
+  // orb reacts to the assistant's voice and takes priority over the music.
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
+    const type = event.data && event.data.type;
+    if (type === "activateVisualizer" || type === "start-visualizer" || type === "triggerAnimation") {
+      ttsActive = true;
+      clearTimeout(ttsTimeout);
+      // Safety net in case a "stop" message is ever missed.
+      ttsTimeout = setTimeout(() => { ttsActive = false; }, 15000);
+    } else if (type === "stop-visualizer") {
+      ttsActive = false;
+      clearTimeout(ttsTimeout);
+    } else if (type === "toggle-mute") {
+      // The header button (in the parent page) mutes/unmutes the music.
+      isMuted = !!event.data.muted;
+      if (!isMuted) { startAudio(); }   // resume context + play on unmute
+      gainNode.gain.setValueAtTime(isMuted ? 0 : 1, context.currentTime);
+      muteBtn.textContent = isMuted ? "🔇" : "🔊";
     }
   });
 
-  particles.verticesNeedUpdate = true;
-  renderer.render(scene, camera);
-  requestAnimationFrame(render);
-}
+  function render() {
+    requestAnimationFrame(render);
+    analyser.getByteFrequencyData(dataArray);
 
+    const t = performance.now() * 0.001;
+    // Analyser is post-gain, so this is true when music is muted or absent.
+    const musicSilent = dataArray.every((v) => v === 0);
 
+    let lowerMaxFr, lowerAvgFr, upperAvgFr;
 
-    
+    if (ttsActive) {
+      // 🎙️ Prioritize the chatbot voice: a gentle, smooth "talking" pulse.
+      // (The Web Speech API can't be analysed directly, so we synthesize a
+      // calm speech-like signal while A.N.G.E.L is speaking. Keep amplitudes
+      // small — high values make the orb explode into spikes.)
+      const pulse = (Math.sin(t * 7.0) + Math.sin(t * 11.0)) * 0.5; // -1..1, layered
+      lowerMaxFr = 0.18 + Math.abs(pulse) * 0.22;   // ~0.18–0.40, more jump
+      lowerAvgFr = 0.14 + Math.abs(Math.sin(t * 4.5)) * 0.12;
+      upperAvgFr = 0.12 + Math.abs(Math.cos(t * 6.0)) * 0.10;
+    } else if (musicSilent) {
+      // Gentle idle breathing (music off/muted and assistant quiet).
+      lowerMaxFr = 0.10 + Math.abs(Math.sin(t * 0.5)) * 0.03;
+      lowerAvgFr = 0.08 + Math.abs(Math.cos(t * 0.4)) * 0.03;
+      upperAvgFr = 0.06 + Math.abs(Math.sin(t * 0.3)) * 0.02;
+    } else {
+      // React to the background music.
+      const lowerHalfArray = dataArray.slice(0, dataArray.length / 2 - 1);
+      const upperHalfArray = dataArray.slice(dataArray.length / 2 - 1, dataArray.length - 1);
+      lowerMaxFr = max(lowerHalfArray) / lowerHalfArray.length;
+      lowerAvgFr = avg(lowerHalfArray) / lowerHalfArray.length;
+      upperAvgFr = avg(upperHalfArray) / upperHalfArray.length;
+    }
+
     makeRoughBall(
       ball,
       modulate(Math.pow(lowerMaxFr, 0.8), 0, 1, 0, 8),
       modulate(upperAvgFr, 0, 1, 0, 4)
     );
 
-    var scale = modulate(lowerAvgFr, 0, 1, 1, 1.4);
+    const scale = modulate(lowerAvgFr, 0, 1, 1, 1.4);
     ball.scale.set(scale, scale, scale);
     glow.scale.set(scale * 1.5, scale * 1.5, scale * 1.5);
 
-    if (lowerMaxFr > 0.3) {
+    const energetic = ttsActive || (!musicSilent && lowerMaxFr > 0.3);
+    if (energetic) {
       warpMode = true;
-      warpStrength = modulate(lowerMaxFr, 0.5, 1, 0.0005, 0.004)
+      warpStrength = modulate(lowerMaxFr, 0.5, 1, 0.0005, 0.004);
     } else {
       warpMode = false;
       warpStrength *= 0.98;
     }
 
-    particles.vertices.forEach(function (v) {
-      if (warpMode) {
-        let dir = v.clone().normalize();
-        v.add(dir.multiplyScalar(warpStrength));
-      }
-
+    particles.vertices.forEach((v) => {
+      const dir = v.clone().normalize();
+      const movement = warpMode ? warpStrength : (musicSilent && !ttsActive ? 0.001 : 0);
+      v.add(dir.multiplyScalar(movement));
       if (v.length() > 150) {
         v.set((Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100);
       }
@@ -281,7 +275,6 @@ function render() {
 
     particles.verticesNeedUpdate = true;
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
   }
 
   function onWindowResize() {
@@ -313,13 +306,15 @@ function render() {
     mesh.geometry.computeFaceNormals();
   }
 
-   {
-  render(); // Start it regardless of audio
-}
-;
+  // Start the render loop immediately (independent of audio playback).
+  if (!visualizerStarted) {
+    render();
+    visualizerStarted = true;
+  }
 
-  // ✅ Set typewriter text AFTER DOM is loaded
-  document.getElementById("typewriter-text").textContent = "A.N.G.E.L";
+  // Set typewriter text if that element exists (guarded — not present on every page).
+  const typewriterEl = document.getElementById("typewriter-text");
+  if (typewriterEl) typewriterEl.textContent = "A.N.G.E.L";
 };
 
 window.onload = vizInit;
@@ -344,45 +339,30 @@ function avg(arr) {
 function max(arr) {
   return arr.reduce((a, b) => Math.max(a, b), -Infinity);
 }
+// Optional inline chat fallback — only wires up if these elements exist on the
+// page (they live in chat-module.html, not the visualizer page that loads this).
 const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-button');
 
-sendBtn.onclick = () => {
-  const msg = chatInput.value.trim();
-  if (!msg) return;
+if (sendBtn && chatInput && chatBox) {
+  sendBtn.onclick = () => {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
 
-  const userDiv = document.createElement('div');
-  userDiv.className = 'chat-message user-message';
-  userDiv.textContent = "You: " + msg;
-  chatBox.appendChild(userDiv);
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-message user-message';
+    userDiv.textContent = "You: " + msg;
+    chatBox.appendChild(userDiv);
 
-  const botDiv = document.createElement('div');
-  botDiv.className = 'chat-message bot-message';
-  botDiv.textContent = "A.N.G.E.L: Affirmative. '" + msg + "' received.";
-  chatBox.appendChild(botDiv);
+    const botDiv = document.createElement('div');
+    botDiv.className = 'chat-message bot-message';
+    botDiv.textContent = "A.N.G.E.L: Affirmative. '" + msg + "' received.";
+    chatBox.appendChild(botDiv);
 
-  chatInput.value = "";
-  chatBox.scrollTop = chatBox.scrollHeight;
-};
-window.addEventListener("message", (event) => {
-  if (event.data.type === "toggle-mute") {
-    const gainNode = window.setGainNode?.();
-    if (gainNode) {
-      const volume = event.data.muted ? 0 : 1;
-      gainNode.gain.setValueAtTime(volume, gainNode.context.currentTime);
-    }
-  }
-});
-let triggerVisualizer = false;
-let triggerTimeout = null;
-
-window.addEventListener("message", (event) => {
-  if (event.data?.type === "triggerAnimation") {
-    triggerVisualizer = true;
-    clearTimeout(triggerTimeout);
-    triggerTimeout = setTimeout(() => {
-      triggerVisualizer = false;
-    }, 2000); // Animation lasts 2s
-  }
-});
+    chatInput.value = "";
+    chatBox.scrollTop = chatBox.scrollHeight;
+  };
+}
+// Note: postMessage handling (toggle-mute, activate/stop-visualizer) lives inside
+// vizInit so it can access the audio graph and the ttsActive flag directly.
