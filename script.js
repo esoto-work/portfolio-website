@@ -1,6 +1,23 @@
 var noise = new SimplexNoise();
 
+// WebGL may be disabled (iOS Lockdown Mode, locked-down devices). Detect it so
+// we can show a graceful static fallback instead of a blank canvas.
+function isWebGLAvailable() {
+  try {
+    var c = document.createElement("canvas");
+    return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl")));
+  } catch (e) {
+    return false;
+  }
+}
+
 var vizInit = function () {
+  var outEl = document.getElementById("out");
+  if (!isWebGLAvailable()) {
+    if (outEl) outEl.innerHTML = '<div class="webgl-fallback"><div class="wf-orb" aria-hidden="true"></div></div>';
+    return; // skip all the WebGL/audio setup on devices without WebGL
+  }
+
   var audio = document.getElementById("audio");
   audio.crossOrigin = "anonymous";
 
