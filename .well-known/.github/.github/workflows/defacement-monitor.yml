@@ -1,0 +1,44 @@
+name: Defacement & availability monitor
+
+# Tamper detection for a static site: periodically fetch the LIVE site and verify
+# it still looks like Eddie's portfolio and contains no gambling/spam markers.
+# A failed run emails the repo owner (GitHub Actions failure notifications) — this
+# is what would have caught the LADANGTOTO gambling takeover early.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # every 30 minutes
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch live site and run content canary
+        run: |
+          set -euo pipefail
+          URL="https://www.cybersoto.com"
+
+          body="$(curl -fsSL --max-time 30 "$URL")" || {
+            echo "::error::Site unreachable (HTTP error or timeout): $URL";
+            exit 1;
+          }
+
+          # Must contain expected markers — proves it's still YOUR content.
+          for needle in "Eddie S." "Cyber Operations"; do
+            if ! grep -qiF "$needle" <<<"$body"; then
+              echo "::error::Expected marker missing: '$needle' — possible defacement.";
+              exit 1;
+            fi
+          done
+
+          # Must NOT contain known gambling / spam indicators (the takeover class).
+          if grep -qiE "slot ?gacor|togel|judi|sbobet|bandar|casino|\btoto\b|ladangtoto" <<<"$body"; then
+            echo "::error::Gambling/spam keywords detected — site may be defaced!";
+            exit 1;
+          fi
+
+          echo "OK: site reachable, content intact, no spam markers."
