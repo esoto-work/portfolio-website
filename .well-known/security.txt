@@ -1,6 +1,0 @@
-# https://www.cybersoto.com/.well-known/security.txt
-Contact: mailto:esoto.work@outlook.com
-Preferred-Languages: en
-Canonical: https://www.cybersoto.com/.well-known/security.txt
-# Update the Expires date periodically (RFC 9116 recommends < 1 year out).
-Expires: 2027-06-06T00:00:00.000Z
