@@ -1,0 +1,37 @@
+name: Defacement & availability monitor
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch live site and run content canary
+        run: |
+          set -euo pipefail
+          URL="https://www.cybersoto.com"
+
+          body="$(curl -fsSL --max-time 30 "$URL")" || {
+            echo "::error::Site unreachable (HTTP error or timeout): $URL";
+            exit 1;
+          }
+
+          for needle in "Eddie S." "Cyber Operations"; do
+            if ! grep -qiF "$needle" <<<"$body"; then
+              echo "::error::Expected marker missing: '$needle' — possible defacement.";
+              exit 1;
+            fi
+          done
+
+          if grep -qiE "slot ?gacor|togel|judi|sbobet|bandar|casino|\btoto\b|ladangtoto" <<<"$body"; then
+            echo "::error::Gambling/spam keywords detected — site may be defaced!";
+            exit 1;
+          fi
+
+          echo "OK: site reachable, content intact, no spam markers."
