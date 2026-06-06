@@ -1,0 +1,14 @@
+# Secrets — never commit these. A static site cannot hold secrets anyway;
+# any key belongs in a server-side proxy, not in this repo.
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+**/serviceAccount*.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
